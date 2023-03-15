@@ -146,22 +146,21 @@ library_linking_strategy_cc_defaults {
     static_libs: [
         "libadb_crypto",
         "libadb_pairing_connection",
+        "libadb_protos",
         "libadb_sysdeps",
         "libadb_tls_connection",
+        "libadbconnection_server",
         "libadbd",
         "libadbd_core",
-        "libadbconnection_server",
+        "libapp_processes_protos_lite",
         "libasyncio",
         "libbrotli",
         "libcrypto_utils",
         "libcutils_sockets",
         "libdiagnose_usb",
         "libmdnssd",
-        "libzstd",
-
-        "libadb_protos",
-        "libapp_processes_protos_lite",
         "libprotobuf-cpp-lite",
+        "libzstd",
     ],
 
     shared_libs: [
@@ -190,7 +189,7 @@ library_linking_strategy_cc_defaults {
         android: {
             shared_libs: ["libcrypto"],
         },
-        linux_glibc: {
+        host_linux: {
             static_libs: ["libcrypto_static"],
         },
         recovery: {
@@ -302,21 +301,21 @@ cc_library_host_static {
 
     static_libs: [
         "libadb_crypto",
-        "libadb_protos",
         "libadb_pairing_connection",
+        "libadb_protos",
         "libadb_tls_connection",
         "libbase",
-        "libcrypto_utils",
         "libcrypto",
-        "libdiagnose_usb",
-        "libmdnssd",
-        "libusb",
-        "libutils",
-        "liblog",
+        "libcrypto_utils",
         "libcutils",
+        "libdiagnose_usb",
+        "liblog",
+        "libmdnssd",
         "libopenscreen-discovery",
         "libopenscreen-platform-impl",
         "libprotobuf-cpp-lite",
+        "libusb",
+        "libutils",
     ],
 }
 
@@ -375,12 +374,12 @@ cc_test_host {
         "libadb_sysdeps",
         "libadb_tls_connection_static",
         "libbase",
-        "libcutils",
-        "libcrypto_utils",
         "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libdiagnose_usb",
         "liblog",
         "libmdnssd",
-        "libdiagnose_usb",
         "libopenscreen-discovery",
         "libopenscreen-platform-impl",
         "libprotobuf-cpp-lite",
@@ -437,11 +436,12 @@ cc_binary_host {
         "libapp_processes_protos_full",
         "libbase",
         "libbrotli",
-        "libcutils",
-        "libcrypto_utils",
         "libcrypto",
-        "libfastdeploy_host",
+        "libcrypto_utils",
+        "libcutils",
         "libdiagnose_usb",
+        "libfastdeploy_host",
+        "liblog",
         "liblog",
         "liblz4",
         "libmdnssd",
@@ -451,9 +451,8 @@ cc_binary_host {
         "libssl",
         "libusb",
         "libutils",
-        "liblog",
-        "libziparchive",
         "libz",
+        "libziparchive",
         "libzstd",
     ],
 
@@ -512,11 +511,11 @@ cc_library_static {
     ],
 
     shared_libs: [
-        "libadbconnection_server",
         "libadb_crypto",
         "libadb_pairing_connection",
         "libadb_protos",
         "libadb_tls_connection",
+        "libadbconnection_server",
         "libadbd_auth",
         "libapp_processes_protos_lite",
         "libasyncio",
@@ -557,6 +556,7 @@ cc_library_static {
         }
     },
 
+    min_sdk_version: "30",
     apex_available: [
         "//apex_available:platform",
         "com.android.adbd",
@@ -591,6 +591,7 @@ cc_library {
         "libbrotli",
         "libdiagnose_usb",
         "liblz4",
+        "libprotobuf-cpp-lite",
         "libzstd",
     ],
 
@@ -604,7 +605,6 @@ cc_library {
         "libbase",
         "libcrypto_utils",
         "libcutils_sockets",
-        "libprotobuf-cpp-lite",
 
         // APEX dependencies.
         "libadbd_auth",
@@ -627,7 +627,7 @@ cc_library {
                 "libselinux",
             ],
             static_libs: [
-                "adbroot_aidl_interface-ndk_platform",
+                "adbroot_aidl_interface-ndk",
             ],
         },
         recovery: {
@@ -640,11 +640,12 @@ cc_library {
                 "libadb_pairing_connection",
             ],
             exclude_static_libs: [
-                "adbroot_aidl_interface-ndk_platform",
+                "adbroot_aidl_interface-ndk",
             ],
         },
     },
 
+    min_sdk_version: "30",
     apex_available: [
         "//apex_available:platform",
         "com.android.adbd",
@@ -659,6 +660,7 @@ cc_library {
     name: "libadbd",
     defaults: ["adbd_defaults", "host_adbd_supported"],
     recovery_available: true,
+    min_sdk_version: "30",
     apex_available: ["com.android.adbd"],
 
     // avoid getting duplicate symbol of android::build::getbuildnumber().
@@ -667,10 +669,21 @@ cc_library {
     // libminadbd wants both, as it's used to build native tests.
     compile_multilib: "both",
 
+    static_libs: [
+        "libadbd_core",
+        "libadbd_services",
+        "libbrotli",
+        "libcutils_sockets",
+        "libdiagnose_usb",
+        "liblz4",
+        "libmdnssd",
+        "libprotobuf-cpp-lite",
+        "libzstd",
+    ],
+
     shared_libs: [
         "libadbconnection_server",
         "libapp_processes_protos_lite",
-        "libprotobuf-cpp-lite",
         "libadb_crypto",
         "libadb_pairing_connection",
         "libadb_tls_connection",
@@ -684,7 +697,6 @@ cc_library {
         // APEX dependencies on the system image.
         "libadbd_auth",
         "libadbd_fs",
-        "libadbd_services",
     ],
 
     target: {
@@ -696,15 +708,6 @@ cc_library {
         }
     },
 
-    static_libs: [
-        "libadbd_core",
-        "libbrotli",
-        "libcutils_sockets",
-        "libdiagnose_usb",
-        "liblz4",
-        "libmdnssd",
-        "libzstd",
-    ],
 
     visibility: [
         "//bootable/recovery/minadbd",
@@ -716,6 +719,7 @@ cc_binary {
     name: "adbd",
     defaults: ["adbd_defaults", "host_adbd_supported", "libadbd_binary_dependencies"],
     recovery_available: true,
+    min_sdk_version: "30",
     apex_available: ["com.android.adbd"],
 
     srcs: [
@@ -732,6 +736,7 @@ cc_binary {
     },
 
     static_libs: [
+        "libadb_protos",
         "libadbd",
         "libadbd_services",
         "libasyncio",
@@ -742,7 +747,6 @@ cc_binary {
     ],
 
     shared_libs: [
-        "libadb_protos",
         "libadbd_auth",
     ],
 
@@ -753,7 +757,7 @@ cc_binary {
             ],
 
             static_libs: [
-                "adbroot_aidl_interface-ndk_platform",
+                "adbroot_aidl_interface-ndk",
             ],
         },
 
@@ -765,7 +769,7 @@ cc_binary {
             ],
 
             exclude_static_libs: [
-                "adbroot_aidl_interface-ndk_platform",
+                "adbroot_aidl_interface-ndk",
             ],
         }
     },
@@ -786,8 +790,8 @@ phony {
 phony {
     name: "adbd_system_api_recovery",
     required: [
-        "libadbd_auth",
-        "libadbd_fs",
+        "libadbd_auth.recovery",
+        "libadbd_fs.recovery",
         "reboot.recovery",
     ],
 }
@@ -808,7 +812,7 @@ cc_binary {
         "libutils",
     ],
     static_libs: [
-        "adbroot_aidl_interface-ndk_platform",
+        "adbroot_aidl_interface-ndk",
     ],
     system_ext_specific: true,
 }
@@ -962,16 +966,16 @@ cc_library_host_static {
         "libadb_host",
         "libandroidfw",
         "libbase",
-        "libcutils",
-        "libcrypto_utils",
         "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
         "libdiagnose_usb",
         "liblog",
         "libmdnssd",
         "libusb",
         "libutils",
-        "libziparchive",
         "libz",
+        "libziparchive",
     ],
     proto: {
         type: "lite",
@@ -1003,9 +1007,9 @@ cc_test_host {
         "libadb_tls_connection_static",
         "libandroidfw",
         "libbase",
-        "libcutils",
-        "libcrypto_utils",
         "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
         "libdiagnose_usb",
         "libfastdeploy_host",
         "liblog",
@@ -1016,8 +1020,8 @@ cc_test_host {
         "libssl",
         "libusb",
         "libutils",
-        "libziparchive",
         "libz",
+        "libziparchive",
     ],
     target: {
         windows: {
@@ -1052,7 +1056,7 @@ aidl_interface {
                 "//apex_available:platform",
                 "com.android.adbd",
             ],
-            min_sdk_version: "apex_inherit",
+            min_sdk_version: "30",
         },
     },
 }
